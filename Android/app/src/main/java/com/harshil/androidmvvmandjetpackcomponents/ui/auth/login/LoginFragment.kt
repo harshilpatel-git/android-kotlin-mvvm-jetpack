@@ -8,7 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.harshil.androidmvvmandjetpackcomponents.R
+import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
 import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
+import com.harshil.androidmvvmandjetpackcomponents.data.network.AuthApi
+import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
 import com.harshil.androidmvvmandjetpackcomponents.internal.toast
@@ -30,7 +33,17 @@ class LoginFragment : Fragment(), LoginListener {
         val binding: LoginFragmentBinding = DataBindingUtil.inflate(
             inflater, R.layout.login_fragment, container, false
         )
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        val authApi = AuthApi()
+        val db = AppDatabase(context?.applicationContext!!)
+        val authRepository = AuthRepository(authApi, db)
+
+        // View model factory class are used to give dependencies to the View model as we
+        // can not directly instantiate view model. So we have to create factory and pass
+        // it view model provider below
+        val loginViewModelFactory = LoginViewModelFactory(authRepository)
+
+        viewModel =
+            ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
         binding.viewModel = viewModel
         return binding.root
     }
@@ -38,6 +51,7 @@ class LoginFragment : Fragment(), LoginListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel.loginListener = this
+
     }
 
     override fun onLoginStart() {

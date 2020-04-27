@@ -6,7 +6,9 @@ import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepositor
 import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
 import com.harshil.androidmvvmandjetpackcomponents.internal.Coroutine
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
     var username: String = ""
     var password: String = ""
@@ -25,7 +27,7 @@ class LoginViewModel : ViewModel() {
         }
         Coroutine.main {
             try {
-                val loginResponse = AuthRepository().userLogin(username, password)
+                val loginResponse = authRepository.userLogin(username, password)
                 loginResponse.user?.let {
                     loginListener.onSuccess(loginResponse.user)
                     return@main

@@ -12,7 +12,7 @@ import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun getUserDao()
+    abstract fun getUserDao(): UserDao
 
     companion object {
 

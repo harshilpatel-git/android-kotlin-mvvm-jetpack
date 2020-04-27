@@ -1,5 +1,6 @@
 package com.harshil.androidmvvmandjetpackcomponents.ui.auth.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepositor
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
 import com.harshil.androidmvvmandjetpackcomponents.internal.toast
+import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment(), LoginListener {
@@ -53,9 +55,12 @@ class LoginFragment : Fragment(), LoginListener {
         super.onActivityCreated(savedInstanceState)
         viewModel.loginListener = this
 
-        viewModel.getLoggedInUser().observe(this, Observer { user ->
+        viewModel.getLoggedInUser().observe(viewLifecycleOwner, Observer { user ->
             if (user != null) {
-
+                Intent(context, HomeActivity::class.java).also {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(it)
+                }
             }
         })
     }
@@ -65,7 +70,7 @@ class LoginFragment : Fragment(), LoginListener {
     }
 
     override fun onSuccess(user: User?) {
-        rootLayout.snackbar("User: ${user?.name}")
+        // Navigation after success is handled by the live data user stored in the database
     }
 
     override fun onFailure(reason: String) {

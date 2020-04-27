@@ -15,6 +15,8 @@ class LoginViewModel(
 
     lateinit var loginListener: LoginListener
 
+    fun getLoggedInUser() = authRepository.getUser()
+
     fun onLoginButtonClicked(view: View) {
         loginListener.onLoginStart()
         if (username.isEmpty()) {
@@ -30,6 +32,7 @@ class LoginViewModel(
                 val loginResponse = authRepository.userLogin(username, password)
                 loginResponse.user?.let {
                     loginListener.onSuccess(loginResponse.user)
+                    authRepository.saveUser(loginResponse.user)
                     return@main
                 }
                 loginListener.onFailure(loginResponse.message)

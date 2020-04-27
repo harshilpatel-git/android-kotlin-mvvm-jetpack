@@ -3,6 +3,8 @@ package com.harshil.androidmvvmandjetpackcomponents.ui.auth.login
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
+import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
+import com.harshil.androidmvvmandjetpackcomponents.internal.Coroutine
 
 class LoginViewModel : ViewModel() {
 
@@ -21,8 +23,19 @@ class LoginViewModel : ViewModel() {
             loginListener.onFailure("Enter valid Password.")
             return
         }
-        val loginResponse = AuthRepository().userLogin(username, password)
-        loginListener.onSuccess(loginResponse)
+        Coroutine.main {
+            try {
+                val loginResponse = AuthRepository().userLogin(username, password)
+                loginResponse.user?.let {
+                    loginListener.onSuccess(loginResponse.user)
+                    return@main
+                }
+                loginListener.onFailure(loginResponse.message)
+            } catch (e: APIException) {
+                loginListener.onFailure(e.message!!)
+            }
+
+        }
     }
 
     fun onSignUpButtonClicked(view: View) {

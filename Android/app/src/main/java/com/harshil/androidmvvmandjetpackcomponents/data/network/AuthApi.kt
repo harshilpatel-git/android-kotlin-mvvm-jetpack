@@ -1,7 +1,7 @@
 package com.harshil.androidmvvmandjetpackcomponents.data.network
 
-import okhttp3.ResponseBody
-import retrofit2.Call
+import com.harshil.androidmvvmandjetpackcomponents.data.network.response.LoginResponse
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Field
@@ -12,10 +12,10 @@ interface AuthApi {
 
     @FormUrlEncoded
     @POST("login")
-    fun userLogin(
+    suspend fun userLogin(
         @Field("username") username: String,
         @Field("password") password: String
-    ): Call<ResponseBody>
+    ): Response<LoginResponse>
 
     companion object {
         operator fun invoke(): AuthApi {

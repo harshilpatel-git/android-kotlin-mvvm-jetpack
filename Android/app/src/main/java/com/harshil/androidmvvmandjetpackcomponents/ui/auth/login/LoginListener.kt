@@ -1,9 +1,9 @@
 package com.harshil.androidmvvmandjetpackcomponents.ui.auth.login
 
-import androidx.lifecycle.LiveData
+import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 
 interface LoginListener {
     fun onLoginStart()
-    fun onSuccess(loginResponse: LiveData<String>)
+    fun onSuccess(loginResponse: User?)
     fun onFailure(reason: String)
 }

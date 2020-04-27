@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.harshil.androidmvvmandjetpackcomponents.R
+import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
+import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
 import com.harshil.androidmvvmandjetpackcomponents.internal.toast
+import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment(), LoginListener {
 
@@ -43,14 +44,12 @@ class LoginFragment : Fragment(), LoginListener {
         context?.applicationContext?.toast("Login started")
     }
 
-    override fun onSuccess(loginResponse: LiveData<String>) {
-        loginResponse.observe(this, Observer {
-            context?.applicationContext?.toast(it)
-        })
+    override fun onSuccess(user: User?) {
+        rootLayout.snackbar("User: ${user?.name}")
     }
 
     override fun onFailure(reason: String) {
-        context?.applicationContext?.toast(reason)
+        rootLayout.snackbar(reason)
     }
 
 }

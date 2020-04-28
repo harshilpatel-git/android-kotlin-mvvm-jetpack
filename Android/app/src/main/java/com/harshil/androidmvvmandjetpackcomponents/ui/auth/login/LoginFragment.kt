@@ -13,6 +13,7 @@ import com.harshil.androidmvvmandjetpackcomponents.R
 import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
 import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 import com.harshil.androidmvvmandjetpackcomponents.data.network.AuthApi
+import com.harshil.androidmvvmandjetpackcomponents.data.network.NetworkConnectionInterceptor
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
@@ -36,7 +37,8 @@ class LoginFragment : Fragment(), LoginListener {
         val binding: LoginFragmentBinding = DataBindingUtil.inflate(
             inflater, R.layout.login_fragment, container, false
         )
-        val authApi = AuthApi()
+        val networkConnectionInterceptor = NetworkConnectionInterceptor(requireContext())
+        val authApi = AuthApi(networkConnectionInterceptor)
         val db = AppDatabase(context?.applicationContext!!)
         val authRepository = AuthRepository(authApi, db)
 

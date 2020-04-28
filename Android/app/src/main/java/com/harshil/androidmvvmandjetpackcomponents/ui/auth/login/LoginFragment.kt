@@ -10,18 +10,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.harshil.androidmvvmandjetpackcomponents.R
-import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
 import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
-import com.harshil.androidmvvmandjetpackcomponents.data.network.AuthApi
-import com.harshil.androidmvvmandjetpackcomponents.data.network.NetworkConnectionInterceptor
-import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
 import com.harshil.androidmvvmandjetpackcomponents.internal.toast
 import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.instance
 
-class LoginFragment : Fragment(), LoginListener {
+class LoginFragment : Fragment(), LoginListener, KodeinAware {
+
+    override val kodein by kodein()
+
+    // View model factory class are used to give dependencies to the View model as we
+    // can not directly instantiate view model. So we have to create factory and pass
+    // it view model provider below
+    private val loginViewModelFactory: LoginViewModelFactory by instance()
 
     companion object {
         fun newInstance() =
@@ -37,15 +42,6 @@ class LoginFragment : Fragment(), LoginListener {
         val binding: LoginFragmentBinding = DataBindingUtil.inflate(
             inflater, R.layout.login_fragment, container, false
         )
-        val networkConnectionInterceptor = NetworkConnectionInterceptor(requireContext())
-        val authApi = AuthApi(networkConnectionInterceptor)
-        val db = AppDatabase(context?.applicationContext!!)
-        val authRepository = AuthRepository(authApi, db)
-
-        // View model factory class are used to give dependencies to the View model as we
-        // can not directly instantiate view model. So we have to create factory and pass
-        // it view model provider below
-        val loginViewModelFactory = LoginViewModelFactory(authRepository)
 
         viewModel =
             ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)

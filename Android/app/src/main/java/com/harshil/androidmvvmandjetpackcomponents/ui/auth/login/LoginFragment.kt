@@ -17,11 +17,12 @@ import com.harshil.androidmvvmandjetpackcomponents.internal.toast
 import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
 import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 class LoginFragment : Fragment(), LoginListener, KodeinAware {
 
-    override val kodein by kodein()
+    override val kodein by closestKodein()
 
     // View model factory class are used to give dependencies to the View model as we
     // can not directly instantiate view model. So we have to create factory and pass

@@ -12,5 +12,5 @@ data class User(
     val username: String
 ) {
     @PrimaryKey(autoGenerate = false)
-    val id: Int = CURRENT_USER_ID
+    var id: Int = CURRENT_USER_ID
 }

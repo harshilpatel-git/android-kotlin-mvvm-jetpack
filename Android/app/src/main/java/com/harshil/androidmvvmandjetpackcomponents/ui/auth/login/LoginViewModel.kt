@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
 import com.harshil.androidmvvmandjetpackcomponents.internal.Coroutine
+import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
 
 class LoginViewModel(
     private val authRepository: AuthRepository
@@ -37,7 +38,9 @@ class LoginViewModel(
                 }
                 loginListener.onFailure(loginResponse.message)
             } catch (e: APIException) {
-                loginListener.onFailure(e.message!!)
+                loginListener.onFailure(e.message.toString())
+            } catch (e: NoConnectivityException) {
+                loginListener.onFailure(e.message.toString())
             }
 
         }

@@ -1,4 +1,4 @@
-package com.harshil.androidmvvmandjetpackcomponents.ui.home.ui.notifications
+package com.harshil.androidmvvmandjetpackcomponents.ui.home.notifications
 
 import android.os.Bundle
 import android.view.LayoutInflater

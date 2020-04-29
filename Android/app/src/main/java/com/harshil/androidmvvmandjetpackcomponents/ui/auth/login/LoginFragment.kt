@@ -29,11 +29,6 @@ class LoginFragment : Fragment(), LoginListener, KodeinAware {
     // it view model provider below
     private val loginViewModelFactory: LoginViewModelFactory by instance()
 
-    companion object {
-        fun newInstance() =
-            LoginFragment()
-    }
-
     private lateinit var viewModel: LoginViewModel
 
     override fun onCreateView(
@@ -47,6 +42,7 @@ class LoginFragment : Fragment(), LoginListener, KodeinAware {
         viewModel =
             ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
         binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         return binding.root
     }
 

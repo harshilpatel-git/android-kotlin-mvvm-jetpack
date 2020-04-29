@@ -1,4 +1,4 @@
-package com.harshil.androidmvvmandjetpackcomponents.ui.home.ui.dashboard
+package com.harshil.androidmvvmandjetpackcomponents.ui.home.dashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater

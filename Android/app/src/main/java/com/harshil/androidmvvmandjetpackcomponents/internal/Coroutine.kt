@@ -12,4 +12,10 @@ object Coroutine {
             work()
         }
     }
+
+    fun io(work: suspend () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            work()
+        }
+    }
 }

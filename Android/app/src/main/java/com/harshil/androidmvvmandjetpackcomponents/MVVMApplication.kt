@@ -4,6 +4,7 @@ import android.app.Application
 import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
 import com.harshil.androidmvvmandjetpackcomponents.data.network.AppApi
 import com.harshil.androidmvvmandjetpackcomponents.data.network.NetworkConnectionInterceptor
+import com.harshil.androidmvvmandjetpackcomponents.data.preferences.PreferenceProvider
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.QuotesRepository
 import com.harshil.androidmvvmandjetpackcomponents.ui.auth.login.LoginViewModelFactory
@@ -23,11 +24,12 @@ class MVVMApplication : Application(), KodeinAware {
         // It provided androidx regarding classes ready to use
         import(androidXModule(this@MVVMApplication))
 
+        bind() from singleton { PreferenceProvider(instance()) }
         bind() from singleton { NetworkConnectionInterceptor(instance()) }
         bind() from singleton { AppApi(instance()) }
         bind() from singleton { AppDatabase(instance()) }
         bind() from singleton { AuthRepository(instance(), instance()) }
-        bind() from singleton { QuotesRepository(instance(), instance()) }
+        bind() from singleton { QuotesRepository(instance(), instance(), instance()) }
 
         bind() from provider { LoginViewModelFactory(instance()) }
         bind() from provider { SignUpViewModelFactory(instance()) }

@@ -1,55 +1,24 @@
 package com.harshil.androidmvvmandjetpackcomponents.ui.auth.login
 
-import android.R
-import android.view.View
 import androidx.lifecycle.ViewModel
-import androidx.navigation.Navigation
+import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
-import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
-import com.harshil.androidmvvmandjetpackcomponents.internal.Coroutine
-import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class LoginViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    var username: String = ""
-    var password: String = ""
-
-    lateinit var loginListener: LoginListener
-
     fun getLoggedInUser() = authRepository.getUser()
 
-    fun onLoginButtonClicked(view: View) {
-        loginListener.onLoginStart()
-        if (username.isEmpty()) {
-            loginListener.onFailure("Enter valid Username.")
-            return
+    suspend fun userLogin(username: String, password: String) =
+        // To make network calls on IO thread and not on Main thread
+        withContext(Dispatchers.IO) {
+            authRepository.userLogin(username, password)
         }
-        if (password.isEmpty()) {
-            loginListener.onFailure("Enter valid Password.")
-            return
-        }
-        Coroutine.main {
-            try {
-                val loginResponse = authRepository.userLogin(username, password)
-                loginResponse.user?.let {
-                    loginListener.onSuccess(loginResponse.user)
-                    authRepository.saveUser(loginResponse.user)
-                    return@main
-                }
-                loginListener.onFailure(loginResponse.message)
-            } catch (e: APIException) {
-                loginListener.onFailure(e.message.toString())
-            } catch (e: NoConnectivityException) {
-                loginListener.onFailure(e.message.toString())
-            }
 
-        }
-    }
 
-    fun onSignUpButtonClicked(view: View) {
-
-    }
+    suspend fun saveUser(user: User) = authRepository.saveUser(user)
 }

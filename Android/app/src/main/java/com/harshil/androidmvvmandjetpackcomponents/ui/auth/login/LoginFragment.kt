@@ -8,21 +8,24 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.harshil.androidmvvmandjetpackcomponents.R
-import com.harshil.androidmvvmandjetpackcomponents.data.db.entities.User
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
+import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
+import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
-import com.harshil.androidmvvmandjetpackcomponents.internal.toast
 import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
+import kotlinx.coroutines.launch
+import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class LoginFragment : Fragment(), LoginListener, KodeinAware {
+class LoginFragment : Fragment(), KodeinAware {
 
-    override val kodein by closestKodein()
+    override val kodein by Kodein()
 
     // View model factory class are used to give dependencies to the View model as we
     // can not directly instantiate view model. So we have to create factory and pass
@@ -31,24 +34,25 @@ class LoginFragment : Fragment(), LoginListener, KodeinAware {
 
     private lateinit var viewModel: LoginViewModel
 
+
+    private lateinit var binding: LoginFragmentBinding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding: LoginFragmentBinding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
             inflater, R.layout.login_fragment, container, false
         )
-
         viewModel =
-            ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
-        binding.viewModel = viewModel
+            ViewModelProvider(this, loginViewModelFactory).get(LoginViewModel::class.java)
+
         binding.lifecycleOwner = this
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.loginListener = this
 
         viewModel.getLoggedInUser().observe(viewLifecycleOwner, Observer { user ->
             if (user != null) {
@@ -58,18 +62,35 @@ class LoginFragment : Fragment(), LoginListener, KodeinAware {
                 }
             }
         })
+
+        binding.loginButton.setOnClickListener {
+            loginUserClicked()
+        }
+
+        binding.signUpButton.setOnClickListener {
+            findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToSignUpFragment())
+        }
     }
 
-    override fun onLoginStart() {
-        context?.applicationContext?.toast("Login started")
-    }
+    private fun loginUserClicked() {
+        val username = binding.usernameEditText.text.toString().trim()
+        val password = binding.passwordEditText.text.toString().trim()
 
-    override fun onSuccess(user: User?) {
-        // Navigation after success is handled by the live data user stored in the database
-    }
+        // TODO: validate user inputs here
 
-    override fun onFailure(reason: String) {
-        rootLayout.snackbar(reason)
+        lifecycleScope.launch {
+            try {
+                val loginResponse = viewModel.userLogin(username, password)
+                loginResponse.user?.let {
+                    viewModel.saveUser(loginResponse.user)
+                    return@launch
+                }
+                rootLayout.snackbar(loginResponse.message)
+            } catch (e: APIException) {
+                rootLayout.snackbar(e.message.toString())
+            } catch (e: NoConnectivityException) {
+                rootLayout.snackbar(e.message.toString())
+            }
+        }
     }
-
 }

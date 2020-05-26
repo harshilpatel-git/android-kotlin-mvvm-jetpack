@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class Quote(
     @PrimaryKey(autoGenerate = false)
     val id: Int,
-    val quote: VisibleForTesting
+    val quote: String
 )

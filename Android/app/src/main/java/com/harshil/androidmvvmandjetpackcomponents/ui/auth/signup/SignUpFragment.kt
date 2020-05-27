@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.harshil.androidmvvmandjetpackcomponents.R
-import com.harshil.androidmvvmandjetpackcomponents.data.network.response.SignUpResponse
 import com.harshil.androidmvvmandjetpackcomponents.databinding.SignUpFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
 import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
@@ -76,7 +75,7 @@ class SignUpFragment : Fragment(), SignUpListener, KodeinAware {
             val email = binding.emialEditText.text.toString().trim()
             val password = binding.passwordEditText.text.toString().trim()
 
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 try {
                     val signUpResponse = viewModel.signUpUser(name, dob, email, password)
                     signUpResponse.user?.let {
@@ -95,13 +94,5 @@ class SignUpFragment : Fragment(), SignUpListener, KodeinAware {
         binding.backToLoginButton.setOnClickListener {
             findNavController().navigate(SignUpFragmentDirections.actionSignUpFragmentToLoginFragment())
         }
-    }
-
-    override fun onSuccess(signUpResponse: SignUpResponse) {
-        // Navigation after success is handled by the live data user stored in the database
-    }
-
-    override fun onFailure(reason: String) {
-        rootLayout.snackbar(reason)
     }
 }

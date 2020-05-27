@@ -78,7 +78,7 @@ class LoginFragment : Fragment(), KodeinAware {
 
         // TODO: validate user inputs here
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val loginResponse = viewModel.userLogin(username, password)
                 loginResponse.user?.let {

@@ -10,6 +10,6 @@ class HomeViewModel(
 
     val quotes by lazyDeferred {
         repository.getQuotes()
-    }
+}
 
 }

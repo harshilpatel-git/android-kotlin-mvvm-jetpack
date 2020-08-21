@@ -12,6 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.harshil.androidmvvmandjetpackcomponents.R
+import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
+import com.harshil.androidmvvmandjetpackcomponents.data.network.AppApi
+import com.harshil.androidmvvmandjetpackcomponents.data.network.NetworkConnectionInterceptor
+import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.databinding.LoginFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
 import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
@@ -19,22 +23,10 @@ import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
 import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
 
-class LoginFragment : Fragment(), KodeinAware {
-
-    override val kodein by Kodein()
-
-    // View model factory class are used to give dependencies to the View model as we
-    // can not directly instantiate view model. So we have to create factory and pass
-    // it view model provider below
-    private val loginViewModelFactory: LoginViewModelFactory by instance()
+class LoginFragment : Fragment() {
 
     private lateinit var viewModel: LoginViewModel
-
-
     private lateinit var binding: LoginFragmentBinding
 
     override fun onCreateView(
@@ -45,7 +37,17 @@ class LoginFragment : Fragment(), KodeinAware {
             inflater, R.layout.login_fragment, container, false
         )
         viewModel =
-            ViewModelProvider(this, loginViewModelFactory).get(LoginViewModel::class.java)
+            ViewModelProvider(
+                // View model factory class are used to give dependencies to the View model as we
+                // can not directly instantiate view model. So we have to create factory and pass
+                // it view model provider below
+                this, LoginViewModelFactory(
+                    AuthRepository(
+                        AppApi.invoke(NetworkConnectionInterceptor(requireContext().applicationContext)),
+                        AppDatabase.invoke(requireContext().applicationContext)
+                    )
+                )
+            ).get(LoginViewModel::class.java)
 
         binding.lifecycleOwner = this
         return binding.root

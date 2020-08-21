@@ -12,34 +12,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.harshil.androidmvvmandjetpackcomponents.R
+import com.harshil.androidmvvmandjetpackcomponents.data.db.AppDatabase
+import com.harshil.androidmvvmandjetpackcomponents.data.network.AppApi
+import com.harshil.androidmvvmandjetpackcomponents.data.network.NetworkConnectionInterceptor
+import com.harshil.androidmvvmandjetpackcomponents.data.repository.AuthRepository
 import com.harshil.androidmvvmandjetpackcomponents.databinding.SignUpFragmentBinding
 import com.harshil.androidmvvmandjetpackcomponents.internal.APIException
 import com.harshil.androidmvvmandjetpackcomponents.internal.NoConnectivityException
 import com.harshil.androidmvvmandjetpackcomponents.internal.snackbar
-import com.harshil.androidmvvmandjetpackcomponents.ui.auth.login.LoginViewModelFactory
 import com.harshil.androidmvvmandjetpackcomponents.ui.home.HomeActivity
 import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
 
-class SignUpFragment : Fragment(), SignUpListener, KodeinAware {
-
-    override val kodein by Kodein()
-
-    // View model factory class are used to give dependencies to the View model as we
-    // can not directly instantiate view model. So we have to create factory and pass
-    // it view model provider below
-
-    companion object {
-        fun newInstance() =
-            SignUpFragment()
-    }
+class SignUpFragment : Fragment() {
 
     private lateinit var viewModel: SignUpViewModel
     private lateinit var binding: SignUpFragmentBinding
-    private val signUpViewModelFactory: LoginViewModelFactory by instance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +39,14 @@ class SignUpFragment : Fragment(), SignUpListener, KodeinAware {
         )
 
         viewModel =
-            ViewModelProvider(this, signUpViewModelFactory).get(SignUpViewModel::class.java)
+            ViewModelProvider(
+                this, SignUpViewModelFactory(
+                    AuthRepository(
+                        AppApi.invoke(NetworkConnectionInterceptor(requireContext().applicationContext)),
+                        AppDatabase.invoke(requireContext().applicationContext)
+                    )
+                )
+            ).get(SignUpViewModel::class.java)
         binding.lifecycleOwner = this
 
         return inflater.inflate(R.layout.sign_up_fragment, container, false)
